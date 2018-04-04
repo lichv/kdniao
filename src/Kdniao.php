@@ -38,6 +38,7 @@ class Kdniao
     public function setConfig($config){
     	$this->ebussionsid=isset($config['ebussionsid'])?$config['ebussionsid']:'';
     	$this->appkey=isset($config['appkey'])?$config['appkey']:'';
+    	return $this;
     }
 
     /**
