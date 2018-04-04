@@ -1,0 +1,17 @@
+{
+    "name": "lichv/kdniao",
+    "description": "kdniao service for laravel",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lichv",
+            "email": "lichvg@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Lichv\\Kdniao\\":"src/"
+        }
+    }
+}
