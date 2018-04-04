@@ -16,6 +16,8 @@ Lichv\Kdniao\KdniaoServiceProvider::class,
 ```
 ###使用
 ```sh
+return Kdniao::setConfig(['ebussionsid'=>'','appkey'=>''])->getOrderTraces('HHTT','580334019453');
+
 return Kdniao::getOrderTraces('HHTT','580334019453');
 ```
 ```sh
