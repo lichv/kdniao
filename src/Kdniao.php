@@ -26,10 +26,18 @@ class Kdniao
      * @param $ebussionid
      * @param $appkey
      */
-    public function __construct()
+    public function __construct($config=[])
     {
-        $this->ebussionsid=env('KDNIAO_EBUSSINESSID','');
-        $this->appkey=env('KDNIAO_APPKEY','');
+    	if (empty($config)) {
+    		$config = ['ebussionsid'=>env('KDNIAO_EBUSSINESSID',''),'appkey'=>env('KDNIAO_APPKEY','')];
+    	}
+    	$this->setConfig($config);
+
+    }
+
+    public function setConfig($config){
+    	$this->ebussionsid=isset($config['ebussionsid'])?$config['ebussionsid']:'';
+    	$this->appkey=isset($config['appkey'])?$config['appkey']:'';
     }
 
     /**
@@ -39,22 +47,22 @@ class Kdniao
     public function getOrderTracesByJson($requestData)
     {
 
-        if (!$this->is_not_json($requestData))
-        {
-            return '$requestData,必须是json类型';
-        }
+    	if (!$this->is_not_json($requestData))
+    	{
+    		return '$requestData,必须是json类型';
+    	}
 
-        $datas=array(
-            'EBusinessID'=>$this->ebussionsid,
-            'RequestType'=>'1002',
-            'RequestData'=>urlencode($requestData),
-            'DataType'=>'2',
-        );
+    	$datas=array(
+    		'EBusinessID'=>$this->ebussionsid,
+    		'RequestType'=>'1002',
+    		'RequestData'=>urlencode($requestData),
+    		'DataType'=>'2',
+    	);
 
-        $datas['DataSign']=$this->encrypt($requestData);
-        $result=$this->sendTracesPost($datas);
+    	$datas['DataSign']=$this->encrypt($requestData);
+    	$result=$this->sendTracesPost($datas);
 
-        return $result;
+    	return $result;
     }
 
     /**
@@ -64,8 +72,8 @@ class Kdniao
      */
     public function getOrderTraces($shipperCode,$LogisticCode)
     {
-        $json="{'OrderCode':'','ShipperCode':"."'".$shipperCode."'".",'LogisticCode':"."'".$LogisticCode."'}";
-        return $this->getOrderTracesByJson($json);
+    	$json="{'OrderCode':'','ShipperCode':"."'".$shipperCode."'".",'LogisticCode':"."'".$LogisticCode."'}";
+    	return $this->getOrderTracesByJson($json);
     }
 
     /**
@@ -75,7 +83,7 @@ class Kdniao
      */
     private function is_not_json($str)
     {
-        return is_null(json_decode($str));
+    	return is_null(json_decode($str));
     }
 
     /**
@@ -85,37 +93,37 @@ class Kdniao
      */
     private function sendTracesPost($datas)
     {
-        $temps = array();
-        foreach ($datas as $key => $value) {
-            $temps[] = sprintf('%s=%s', $key, $value);
-        }
-        $post_data = implode('&', $temps);
-        $url_info = parse_url("http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx");
-        if(empty($url_info['port']))
-        {
-            $url_info['port']=80;
-        }
-        $httpheader = "POST " . $url_info['path'] . " HTTP/1.0\r\n";
-        $httpheader.= "Host:" . $url_info['host'] . "\r\n";
-        $httpheader.= "Content-Type:application/x-www-form-urlencoded\r\n";
-        $httpheader.= "Content-Length:" . strlen($post_data) . "\r\n";
-        $httpheader.= "Connection:close\r\n\r\n";
-        $httpheader.= $post_data;
-        $fd = fsockopen($url_info['host'], $url_info['port']);
-        fwrite($fd, $httpheader);
-        $gets = "";
-        $headerFlag = true;
-        while (!feof($fd)) {
-            if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
-                break;
-            }
-        }
-        while (!feof($fd)) {
-            $gets.= fread($fd, 128);
-        }
-        fclose($fd);
+    	$temps = array();
+    	foreach ($datas as $key => $value) {
+    		$temps[] = sprintf('%s=%s', $key, $value);
+    	}
+    	$post_data = implode('&', $temps);
+    	$url_info = parse_url("http://api.kdniao.cc/Ebusiness/EbusinessOrderHandle.aspx");
+    	if(empty($url_info['port']))
+    	{
+    		$url_info['port']=80;
+    	}
+    	$httpheader = "POST " . $url_info['path'] . " HTTP/1.0\r\n";
+    	$httpheader.= "Host:" . $url_info['host'] . "\r\n";
+    	$httpheader.= "Content-Type:application/x-www-form-urlencoded\r\n";
+    	$httpheader.= "Content-Length:" . strlen($post_data) . "\r\n";
+    	$httpheader.= "Connection:close\r\n\r\n";
+    	$httpheader.= $post_data;
+    	$fd = fsockopen($url_info['host'], $url_info['port']);
+    	fwrite($fd, $httpheader);
+    	$gets = "";
+    	$headerFlag = true;
+    	while (!feof($fd)) {
+    		if (($header = @fgets($fd)) && ($header == "\r\n" || $header == "\n")) {
+    			break;
+    		}
+    	}
+    	while (!feof($fd)) {
+    		$gets.= fread($fd, 128);
+    	}
+    	fclose($fd);
 
-        return $gets;
+    	return $gets;
     }
 
     /**
@@ -125,6 +133,6 @@ class Kdniao
      */
     private function encrypt($data)
     {
-        return urlencode(base64_encode(md5($data.$this->appkey)));
+    	return urlencode(base64_encode(md5($data.$this->appkey)));
     }
 }
